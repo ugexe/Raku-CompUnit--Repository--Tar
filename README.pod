@@ -6,24 +6,20 @@
 
 Load modules directory from a .tar.gz archive
 
-Note: This doesn't do anything useful yet.
-
 =head3 Synopsis
 
     # some file in this distributions t/ directory
 
     use CompUnit::Repository::Tar;
-    $*REPO;
-    PROCESS::<$REPO> := CompUnit::Repository::Tar.new(
-        :prefix($?FILE.IO.parent.child('data/zef.tar.gz')),
-        :next-repo(CompUnit::RepositoryRegistry.repository-for-name('perl')),
-        :name('tar'),
-    );
 
-    require <tar#lib/Zef.pm6>         # OK
-    require <tar#lib/Zef/Client.pm6>; # Fails (Can't find other modules in Repository)
-                                      # Could not find Zef
+    # Archive must contain a META6.json file
+    my $archive = $?FILE.IO.parent.child('data/zef.tar.gz');
+    use lib "CompUnit::Repository::Tar#{~$archive}";
 
-See L<t/01-basic.t|https://github.com/ugexe/Perl6-CompUnit--Repository--Tar/blob/master/t/01-basic.t>
+    require <lib/Zef.pm6>  # `require` by relative path
+    require <Zef::Client>; # `require` by name
+    use Zef::CLI;          # `use` by name
+
+See: L<tests|https://github.com/ugexe/Perl6-CompUnit--Repository--Tar/blob/master/t>
 
 =cut
