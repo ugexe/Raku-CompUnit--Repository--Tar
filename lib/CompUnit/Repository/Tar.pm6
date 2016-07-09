@@ -7,16 +7,16 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
 
     my %seen;
 
-    method dist      { state $dist = Distribution::Common::Tar.new($.prefix.IO) }
-    method path2name { state %path2name = self.dist.meta<provides>.map({ (.value ~~ Str ?? .value !! .value.key) => .key }) }
-    method name2path { state %name2path = self.dist.meta<provides>.map({ .key => (.value ~~ Str ?? .value !! .value.key) }) }
+    method !dist      { state $dist = Distribution::Common::Tar.new($.prefix.IO) }
+    method !path2name { state %path2name = self!dist.meta<provides>.map({ (.value ~~ Str ?? .value !! .value.key) => .key }) }
+    method !name2path { state %name2path = self!dist.meta<provides>.map({ .key => (.value ~~ Str ?? .value !! .value.key) }) }
 
     method need(CompUnit::DependencySpecification $spec,
                 CompUnit::PrecompilationRepository $precomp = self.precomp-repository())
         returns CompUnit:D
     {
         my $name      = $spec.short-name;
-        my $name-path = self.name2path{$name};
+        my $name-path = self!name2path{$name};
 
         if $name-path {
             my $base = $!prefix.IO.child($name-path);
@@ -26,17 +26,10 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
             my $id = nqp::sha1($name ~ $*REPO.id);
             my $*RESOURCES = Distribution::Resources.new(:repo(self), :dist-id(''));
 
-            my $bytes  = Blob.new( self.dist.content($name-path).slurp-rest(:bin) );
+            my $bytes  = Blob.new( self!dist.content($name-path).slurp-rest(:bin) );
             my $handle = CompUnit::Loader.load-source( $bytes );
-            my $cu = CompUnit.new(
-                :$handle,
-                :short-name($name),
-                :repo(self),
-                :repo-id(~$!prefix),
-                :precompiled(False),
-            );
 
-            return %!loaded{$name} = %seen{$base} = CompUnit.new(
+            return %!loaded{$name} //= %seen{$base} = CompUnit.new(
                 :short-name($name),
                 :$handle,
                 :repo(self),
@@ -50,12 +43,12 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
     }
 
     method load(Str(Cool) $name-path) returns CompUnit:D {
-        my $name = self.path2name{$name-path} // (self.name2path{$name-path} ?? $name-path !! Nil);
-        my $path = self.name2path{$name-path} // (self.path2name{$name-path} ?? $name-path !! Nil);
+        my $name = self!path2name{$name-path} // (self!name2path{$name-path} ?? $name-path !! Nil);
+        my $path = self!name2path{$name-path} // (self!path2name{$name-path} ?? $name-path !! Nil);
 
         if $path {
             # XXX: Distribution::Common's .slurp-rest(:bin) doesn't work right yet, hence the `.encode`
-            my $bytes  = Blob.new( self.dist.content($path).slurp-rest(:bin) );
+            my $bytes  = Blob.new( self!dist.content($path).slurp-rest(:bin) );
             my $handle = CompUnit::Loader.load-source( $bytes );
             my $base   = ~$!prefix.IO.child($path);
             return %!loaded{$path} //= %seen{$base} = CompUnit.new(
