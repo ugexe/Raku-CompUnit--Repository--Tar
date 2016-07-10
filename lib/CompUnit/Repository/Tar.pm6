@@ -1,7 +1,8 @@
-use Distribution::Common;
+use Distribution::Common::Tar;
 use nqp;
 
 class CompUnit::Repository::Tar does CompUnit::Repository {
+    has %!resources;#  %?RESOURCES has to return IO::Paths, so cache what we write to temp files
     has %!loaded;
     has $.prefix;
 
@@ -78,5 +79,34 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
 
     method path-spec() {
         'tar#'
+    }
+
+    method resource($dist-id, $key) {
+        %!resources{$key} //= do {
+            my $temp-repo-dir  = $*TMPDIR.child($*REPO.id);
+            my $temp-dist-dir  = $temp-repo-dir.child(nqp::sha1(self!dist.Str));
+            my $temp-file = $temp-dist-dir.child($key);
+
+            mkdir $temp-repo-dir    unless $temp-repo-dir.e;
+            mkdir $temp-dist-dir    unless $temp-dist-dir.e;
+            mkdir $temp-file.parent unless $temp-file.parent.e;
+
+            my $resource-handle = self!dist.content($key);
+            my $resource-bytes  = Blob.new($resource-handle.open(:bin).slurp-rest(:bin));
+
+            spurt $temp-file, $resource-bytes;
+            IO::Path.new($temp-file);
+        }
+    }
+
+
+    method files($file, :$name, :$auth, :$ver) {
+        return () if ($name and self!dist.meta<meta><name> ne $name)
+                  || ($auth and self!dist.meta<meta><auth> ne $auth)
+                  || ($ver  and self!dist.meta<meta><ver>  ne $ver);
+
+        my @libs  = self!path2name.keys;
+        my @files = self!dist.meta<files>.map: { $_ ~~ Str ?? $_ !! $_.value }
+        flat @libs, @files
     }
 }
