@@ -99,7 +99,6 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
         }
     }
 
-
     method files($file, :$name, :$auth, :$ver) {
         return () if ($name and self!dist.meta<meta><name> ne $name)
                   || ($auth and self!dist.meta<meta><auth> ne $auth)

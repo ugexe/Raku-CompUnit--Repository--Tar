@@ -13,7 +13,7 @@ subtest {
 }, 'require module with no dependencies';
 
 subtest {
-    nok '$!dist' ~~ any( ::("Zef::Client").^attributes>>.name ),  'module not yet loaded';
+    nok '$!config' ~~ any( ::("Zef::Client").^attributes>>.name ),  'module not yet loaded';
     lives-ok { require "Zef::Client" },                           'module require-d ok';
     ok '$!config' ~~ any( ::("Zef::Client").^attributes>>.name ), 'module loaded';
 }, 'require modules with multi-level dependency chain';
