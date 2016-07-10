@@ -1,6 +1,7 @@
 use Distribution::Common::Tar;
 use nqp;
 
+
 class CompUnit::Repository::Tar does CompUnit::Repository {
     has %!resources;#  %?RESOURCES has to return IO::Paths, so cache what we write to temp files
     has %!loaded;
@@ -99,13 +100,13 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
         }
     }
 
+    # XXX: this method feels like it doesn't belong in a CUR that represent a single distribution
     method files($file, :$name, :$auth, :$ver) {
-        return () if ($name and self!dist.meta<meta><name> ne $name)
-                  || ($auth and self!dist.meta<meta><auth> ne $auth)
-                  || ($ver  and self!dist.meta<meta><ver>  ne $ver);
-
-        my @libs  = self!path2name.keys;
-        my @files = self!dist.meta<files>.map: { $_ ~~ Str ?? $_ !! $_.value }
-        flat @libs, @files
+        state @name-paths = self!dist.meta<files>.map: { $_ ~~ Str ?? $_ !! $_.key }
+        return () if $file ~~ none(@name-paths)
+                  || (?$name and self!dist.meta<name> ne $name)
+                  || (?$auth and self!dist.meta<auth> ne $auth)
+                  || (?$ver  and self!dist.meta<ver>  ne $ver);
+        self!dist.meta;
     }
 }
