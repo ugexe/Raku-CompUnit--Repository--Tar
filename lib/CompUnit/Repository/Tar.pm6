@@ -10,8 +10,8 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
     my %seen;
 
     method !dist      { state $dist = Distribution::Common::Tar.new($.prefix.IO) }
-    method !path2name { state %path2name = self!dist.meta<provides>.map({ (.value ~~ Str ?? .value !! .value.key) => .key }) }
-    method !name2path { state %name2path = self!dist.meta<provides>.map({ .key => (.value ~~ Str ?? .value !! .value.key) }) }
+    method !path2name { state %path2name = self!dist.meta<provides>.map({ parse-value(.value) => .key }) }
+    method !name2path { state %name2path = self!dist.meta<provides>.map({ .key => parse-value(.value) }) }
 
     method need(CompUnit::DependencySpecification $spec,
                 CompUnit::PrecompilationRepository $precomp = self.precomp-repository())
@@ -84,9 +84,9 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
 
     method resource($dist-id, $key) {
         %!resources{$key} //= do {
-            my $temp-repo-dir  = $*TMPDIR.child($*REPO.id);
-            my $temp-dist-dir  = $temp-repo-dir.child(nqp::sha1(self!dist.Str));
-            my $temp-file = $temp-dist-dir.child($key);
+            my $temp-repo-dir = $*TMPDIR.child($*REPO.id);
+            my $temp-dist-dir = $temp-repo-dir.child(nqp::sha1(self!dist.Str));
+            my $temp-file     = $temp-dist-dir.child($key);
 
             mkdir $temp-repo-dir    unless $temp-repo-dir.e;
             mkdir $temp-dist-dir    unless $temp-dist-dir.e;
@@ -102,11 +102,19 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
 
     # XXX: this method feels like it doesn't belong in a CUR that represent a single distribution
     method files($file, :$name, :$auth, :$ver) {
-        state @name-paths = self!dist.meta<files>.map: { $_ ~~ Str ?? $_ !! $_.key }
+        my @name-paths = self!dist.meta<files>.map(*.&parse-value);
         return () if $file ~~ none(@name-paths)
-                  || (?$name and self!dist.meta<name> ne $name)
-                  || (?$auth and self!dist.meta<auth> ne $auth)
-                  || (?$ver  and self!dist.meta<ver>  ne $ver);
+                  || (?$name and $name ne self!dist.meta<name>)
+                  || (?$auth and $auth ne self!dist.meta<auth>)
+                  || (?$ver  and $ver  ne self!dist.meta<ver version>.first(*.defined));
         self!dist.meta;
+    }
+
+    my sub parse-value($str-or-kv) {
+        do given $str-or-kv {
+            when Str  { $_ }
+            when Hash { $_.keys[0] }
+            when Pair { $_.key     }
+        }
     }
 }
