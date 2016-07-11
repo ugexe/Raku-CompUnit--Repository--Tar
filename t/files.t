@@ -23,7 +23,9 @@ subtest {
 
 subtest {
     ok  $*REPO.repo-chain[0].files("bin/zef", ver => "*");
-    nok $*REPO.repo-chain[0].files("bin/zef", ver => "xxx");
+    # TODO: replace zef.tar.gz with a lighter weight test distro that also
+    # doesn't happen to have a version of "*" (which would match the xxx below)
+    # nok $*REPO.repo-chain[0].files("bin/zef", ver => "xxx");
 }, 'name-path and distribution ver';
 
 subtest {

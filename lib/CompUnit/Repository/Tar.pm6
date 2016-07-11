@@ -88,6 +88,28 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
     }
 
 
+    method resolve(
+        CompUnit::DependencySpecification $spec,
+    )
+        returns CompUnit
+    {
+        if self!spec-matcher(:name($spec.short-name), :auth($spec.auth-matcher), :ver($spec.version-matcher)) {
+            return CompUnit.new(
+                :handle(CompUnit::Handle),
+                :short-name($spec.short-name),
+                :version(Version.new: self!dist.meta<ver version>.first(*.defined) // 0),
+                :auth(self!dist.meta<auth> // Str),
+                :repo(self),
+                :repo-id(self!cur-id($spec.short-name)),
+                :distribution(self!dist),
+                :!precompiled,
+            );
+        }
+        return self.next-repo.resolve($spec) if self.next-repo;
+        Nil
+    }
+
+
     method resource($dist-id, $key) {
         %!resources{$key} //= do {
             my $temp-repo-dir = $*TMPDIR.child($*REPO.id);
