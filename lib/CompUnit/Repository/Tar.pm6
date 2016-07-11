@@ -12,6 +12,21 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
     method !dist      { state $dist = Distribution::Common::Tar.new($.prefix.IO) }
     method !path2name { state %path2name = self!dist.meta<provides>.map({ parse-value(.value) => .key }) }
     method !name2path { state %name2path = self!dist.meta<provides>.map({ .key => parse-value(.value) }) }
+    method !cur-id($name) { nqp::sha1(join '/', $!prefix, $name, $*REPO.id) }
+    method !spec-matcher(:$name!, :$auth, :version(:$ver)) {
+        return unless any($name eq self!dist.meta<name>, |(self!dist.meta<provides><<$name>>:exists));
+        return if ?$auth and self!dist.meta<auth> !~~ $auth;
+        return if ?$auth and self!dist.meta<ver version>.first(*.defined) !~~ $ver;
+        True
+    }
+
+    method id        { 'tar'  }
+    method short-id  { 'tar'  }
+    method path-spec { 'tar#' }
+    method loaded returns Iterable {
+        return %!loaded.values;
+    }
+
 
     method need(CompUnit::DependencySpecification $spec,
                 CompUnit::PrecompilationRepository $precomp = self.precomp-repository())
@@ -25,17 +40,19 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
             return %!loaded{$name} if %!loaded{$name}:exists;
             return %seen{$base}    if %seen{$base}:exists;
 
-            my $id = nqp::sha1($name ~ $*REPO.id);
             my $*RESOURCES = Distribution::Resources.new(:repo(self), :dist-id(''));
 
             my $bytes  = Blob.new( self!dist.content($name-path).slurp-rest(:bin) );
             my $handle = CompUnit::Loader.load-source( $bytes );
 
             return %!loaded{$name} //= %seen{$base} = CompUnit.new(
-                :short-name($name),
                 :$handle,
+                :short-name($name),
+                :version(Version.new: self!dist.meta<ver version>.first(*.defined) // 0),
+                :auth(self!dist.meta<auth> // Str),
                 :repo(self),
-                :repo-id($id),
+                :repo-id(self!cur-id($name)),
+                :distribution(self!dist),
                 :!precompiled,
             );
         }
@@ -43,6 +60,7 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
         return self.next-repo.need($spec, $precomp) if self.next-repo;
         X::CompUnit::UnsatisfiedDependency.new(:specification($spec)).throw;
     }
+
 
     method load(Str(Cool) $name-path) returns CompUnit:D {
         my $name = self!path2name{$name-path} // (self!name2path{$name-path} ?? $name-path !! Nil);
@@ -55,9 +73,12 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
             my $base   = ~$!prefix.IO.child($path);
             return %!loaded{$path} //= %seen{$base} = CompUnit.new(
                 :$handle,
-                :short-name($path),
+                :short-name($name),
+                :version(Version.new: self!dist.meta<ver version>.first(*.defined) // 0),
+                :auth(self!dist.meta<auth> // Str),
                 :repo(self),
-                :repo-id(~$!prefix),
+                :repo-id(self!cur-id($name)),
+                :distribution(self!dist),
                 :!precompiled,
             );
         }
@@ -66,21 +87,6 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
         die("Could not find $path in:\n" ~ $*REPO.repo-chain.map(*.Str).join("\n").indent(4));
     }
 
-    method loaded() returns Iterable {
-        return %!loaded.values;
-    }
-
-    method id() {
-        'tar'
-    }
-
-    method short-id() {
-        'tar'
-    }
-
-    method path-spec() {
-        'tar#'
-    }
 
     method resource($dist-id, $key) {
         %!resources{$key} //= do {
@@ -100,15 +106,14 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
         }
     }
 
+
     # XXX: this method feels like it doesn't belong in a CUR that represent a single distribution
-    method files($file, :$name, :$auth, :$ver) {
+    method files($file, :$name = self!dist.meta<name>, :$auth, :$ver) {
         my @name-paths = self!dist.meta<files>.map(*.&parse-value);
-        return () if $file ~~ none(@name-paths)
-                  || (?$name and $name ne self!dist.meta<name>)
-                  || (?$auth and $auth ne self!dist.meta<auth>)
-                  || (?$ver  and $ver  ne self!dist.meta<ver version>.first(*.defined));
+        return () if $file ~~ none(@name-paths) || !self!spec-matcher(:$name, :$auth, :$ver);
         self!dist.meta;
     }
+
 
     my sub parse-value($str-or-kv) {
         do given $str-or-kv {
