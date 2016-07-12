@@ -6,6 +6,8 @@
 
 Load modules directory from a .tar.gz archive
 
+=for HTML <a href="https://travis-ci.org/ugexe/Perl6-CompUnit--Repository--Tar"><img src="https://travis-ci.org/ugexe/Perl6-CompUnit--Repository--Tar.svg?branch=master"></a>
+
 =head3 Synopsis
 
     # some file in this distributions t/ directory
