@@ -4,7 +4,7 @@
 
 =head2 CompUnit::Repository::Tar
 
-Load modules directory from a .tar.gz archive
+Load modules directly from a .tar.gz archive
 
 =for HTML <a href="https://travis-ci.org/ugexe/Perl6-CompUnit--Repository--Tar"><img src="https://travis-ci.org/ugexe/Perl6-CompUnit--Repository--Tar.svg?branch=master"></a>
           <a href="https://ci.appveyor.com/project/ugexe/Perl6-CompUnit--Repository--Tar/branch/master"><img src="https://ci.appveyor.com/api/projects/status/github/ugexe/Perl6-CompUnit--Repository--Tar?branch=master&passingText=Windows%20-%20OK&failingText=Windows%20-%20FAIL&pendingText=Windows%20-%20pending&svg=true"></a>
