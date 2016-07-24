@@ -16,7 +16,7 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
     method !spec-matcher(:$name!, :$auth, :version(:$ver)) {
         return unless any($name eq self!dist.meta<name>, |(self!dist.meta<provides><<$name>>:exists));
         return if ?$auth and self!dist.meta<auth> !~~ $auth;
-        return if ?$auth and self!dist.meta<ver version>.first(*.defined) !~~ $ver;
+        return if ?$ver  and self!dist.meta<ver version>.first(*.defined) !~~ $ver;
         True
     }
 
