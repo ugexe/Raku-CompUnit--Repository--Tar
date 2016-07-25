@@ -15,7 +15,7 @@ build: off
 test_script:
     # Install dependency Distribution::Common
     - git clone https://github.com/ugexe/zef %APPVEYOR_BUILD_FOLDER%\..\zef
-    - perl6 -I %APPVEYOR_BUILD_FOLDER%\..\zef\lib %APPVEYOR_BUILD_FOLDER%\..\zef\bin\zef install Distribution::Common
+    - perl6 -I %APPVEYOR_BUILD_FOLDER%\..\zef\lib %APPVEYOR_BUILD_FOLDER%\..\zef\bin\zef --depsonly install .
 
     # Test CompUnit::Repository::Tar
     - prove -v -e "perl6 -Ilib" t/
