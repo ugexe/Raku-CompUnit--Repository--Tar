@@ -1,22 +1,22 @@
+use v6;
 use Test;
 plan 2;
 
 use CompUnit::Repository::Tar;
-
-use lib "CompUnit::Repository::Tar#{$?FILE.IO.parent.child('data/zef.tar.gz')}";
+use lib "CompUnit::Repository::Tar#{CompUnit::Repository::Tar.test-dist('zef.tar.gz')}";
 
 
 my $matching-spec = CompUnit::DependencySpecification.new(
-    short-name      => 'Zef::Client',
+    short-name      => 'Zef',
     auth-matcher    => 'github:ugexe',
-    version-matcher => '*',
 );
 my $missing-spec = CompUnit::DependencySpecification.new(
-    short-name      => 'Zef::Client',
+    short-name      => 'Zef',
     auth-matcher    => 'cpan:ugexe',
-    version-matcher => '*',
+    version-matcher => '666',
 );
-
 
 ok  $*REPO.repo-chain[0].resolve($matching-spec);
 nok $*REPO.repo-chain[0].resolve($missing-spec);
+
+done-testing;

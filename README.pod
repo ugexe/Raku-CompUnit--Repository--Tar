@@ -11,17 +11,12 @@ Load modules directly from a .tar.gz archive
 
 =head3 Synopsis
 
-    # some file in this distributions t/ directory
-
     use CompUnit::Repository::Tar;
+    use lib "CompUnit::Repository::Tar#resources/test-dists/zef.tar.gz";
 
-    # Archive must contain a META6.json file
-    my $archive = $?FILE.IO.parent.child('data/zef.tar.gz');
-    use lib "CompUnit::Repository::Tar#{~$archive}";
-
-    require <lib/Zef.pm6>  # `require` by relative path
-    require <Zef::Client>; # `require` by name
-    use Zef::CLI;          # `use` by name
+    require "lib/Zef.pm6"  # `require` by relative path
+    require "Zef";         # `require` by name
+    use Zef;               # `use` by name
 
 See: L<tests|https://github.com/ugexe/Perl6-CompUnit--Repository--Tar/blob/master/t>
 
