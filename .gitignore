@@ -5,3 +5,4 @@ blib/
 tmp/
 lib/.precomp/
 .precomp/
+.DS_Store

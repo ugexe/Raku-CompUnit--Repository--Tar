@@ -89,7 +89,7 @@ class CompUnit::Repository::Tar does CompUnit::Repository {
         ));
     }
     multi method candidates(CompUnit::DependencySpecification $spec) {
-        return Empty unless $spec.from eq 'Perl6';
+        return Empty unless $spec.from eq 'Perl6' || $spec.from eq 'Raku';
 
         my $version-matcher = ($spec.version-matcher ~~ Bool)
             ?? $spec.version-matcher

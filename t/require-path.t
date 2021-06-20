@@ -9,10 +9,10 @@ use lib "CompUnit::Repository::Tar#{CompUnit::Repository::Tar.test-dist('zef.tar
 subtest 'require module with no external dependencies' => {
     {
         dies-ok { ::("Zef") };
-        lives-ok { require 'lib/Zef.pm6' <&from-json>; }, 'module require-d ok';
+        lives-ok { require 'lib/Zef.rakumod' <&zrun>; }, 'module require-d ok';
     }
     {
-        require 'lib/Zef/Utils/FileSystem.pm6' <&list-paths>;
+        require 'lib/Zef/Utils/FileSystem.rakumod' <&list-paths>;
         ok &list-paths($*CWD).elems;
     }
 }

@@ -9,7 +9,7 @@ use lib "CompUnit::Repository::Tar#{CompUnit::Repository::Tar.test-dist('zef.tar
 subtest 'require module with no external dependencies' => {
     {
         dies-ok { ::("Zef") };
-        lives-ok { require ::("Zef") <&from-json> }, 'module require-d ok';
+        lives-ok { require ::("Zef") <&zrun> }, 'module require-d ok';
     }
     {
         require ::("Zef::Utils::FileSystem") <&list-paths>;
