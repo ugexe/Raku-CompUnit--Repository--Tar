@@ -16,8 +16,8 @@
     "depends"      : [ "Distribution::Common" ],
     "test-depends" : [ "Test:ver<6.c+>" ],
     "support"      : {
-        "bugtracker" : "https://github.com/ugexe/CompUnit--Repository--Tar/issues",
-        "source"     : "https://github.com/ugexe/CompUnit--Repository--Tar.git"
+        "bugtracker" : "https://github.com/ugexe/Raku-CompUnit--Repository--Tar/issues",
+        "source"     : "https://github.com/ugexe/Raku-CompUnit--Repository--Tar.git"
     },
     "tags"         : [ "CompUnit", "Repository", "Tar" ]
 }
