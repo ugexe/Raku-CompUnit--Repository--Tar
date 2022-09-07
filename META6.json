@@ -11,7 +11,8 @@
         "CompUnit::Repository::Tar" : "lib/CompUnit/Repository/Tar.rakumod"
     },
     "resources"   : [
-        "test-dists/zef.tar.gz"
+        "test-dists/Distribution--Common-v0.1.0.tar.gz",
+        "test-dists/PathTools-v0.2.0.tar.gz"
     ],
     "depends"     : [ "Distribution::Common" ],
     "support"     : {

@@ -3,17 +3,17 @@ use Test;
 plan 1;
 
 use CompUnit::Repository::Tar;
-use lib "CompUnit::Repository::Tar#{CompUnit::Repository::Tar.test-dist('zef.tar.gz')}";
+use lib "CompUnit::Repository::Tar#{CompUnit::Repository::Tar.test-dist('PathTools-v0.2.0.tar.gz')}";
 
 
 subtest 'require module with no external dependencies' => {
     {
-        dies-ok { ::("Zef") };
-        lives-ok { require ::("Zef") <&zrun> }, 'module require-d ok';
+        dies-ok { ::("PathTools") };
+        lives-ok { require ::("PathTools") <&ls> }, 'module require-d ok';
     }
     {
-        require ::("Zef::Utils::FileSystem") <&list-paths>;
-        ok &list-paths($*CWD).elems;
+        require ::("PathTools") <&ls>;
+        ok &ls($*CWD).elems > 1;
     }
 }
 

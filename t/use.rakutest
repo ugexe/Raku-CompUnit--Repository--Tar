@@ -1,26 +1,18 @@
 use v6;
 use Test;
-plan 2;
+plan 1;
 
 use CompUnit::Repository::Tar;
-use lib "CompUnit::Repository::Tar#{CompUnit::Repository::Tar.test-dist('zef.tar.gz')}";
+use lib "CompUnit::Repository::Tar#{CompUnit::Repository::Tar.test-dist('Distribution--Common-v0.1.0.tar.gz')}";
 
 
-subtest 'require module with no external dependencies' => {
+subtest 'use modules with external dependency chain' => {
     {
-        dies-ok { ::("Zef") };
+        dies-ok { ::('Distribution::Common::Git') };
     }
     {
-        use-ok("Zef"), 'module use-d ok';
-    }
-}
-
-subtest 'require modules with external dependency chain' => {
-    {
-        dies-ok { ::("Zef::Build") };
-    }
-    {
-        use-ok("Zef::Build"), 'module use-d ok';
+        use-ok('Distribution::Common::Git', 'module use-d ok');
+        lives-ok { ::('Distribution::Common::Git') };
     }
 }
 
