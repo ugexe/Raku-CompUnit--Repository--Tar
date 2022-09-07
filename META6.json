@@ -1,5 +1,4 @@
 {
-    "perl"        : "6.c",
     "name"        : "CompUnit::Repository::Tar",
     "api"         : "0",
     "version"     : "0.0.3",
@@ -14,10 +13,11 @@
         "test-dists/Distribution--Common-v0.1.0.tar.gz",
         "test-dists/PathTools-v0.2.0.tar.gz"
     ],
-    "depends"     : [ "Distribution::Common" ],
-    "support"     : {
+    "depends"      : [ "Distribution::Common" ],
+    "test-depends" : [ "Test:ver<6.c+>" ],
+    "support"      : {
         "bugtracker" : "https://github.com/ugexe/CompUnit--Repository--Tar/issues",
         "source"     : "https://github.com/ugexe/CompUnit--Repository--Tar.git"
     },
-    "tags"        : [ "CompUnit", "Repository", "Tar" ]
+    "tags"         : [ "CompUnit", "Repository", "Tar" ]
 }
