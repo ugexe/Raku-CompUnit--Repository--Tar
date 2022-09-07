@@ -1,17 +1,16 @@
-use v6;
-use Test;
+use Test:ver<6.c+>;
 plan 2;
 
 use CompUnit::Repository::Tar;
-use lib "CompUnit::Repository::Tar#{CompUnit::Repository::Tar.test-dist('zef.tar.gz')}";
+use lib "CompUnit::Repository::Tar#{CompUnit::Repository::Tar.test-dist('Distribution--Common-v0.1.0.tar.gz')}";
 
 
 my $matching-spec = CompUnit::DependencySpecification.new(
-    short-name      => 'Zef',
+    short-name      => 'Distribution::Common',
     auth-matcher    => 'github:ugexe',
 );
 my $missing-spec = CompUnit::DependencySpecification.new(
-    short-name      => 'Zef',
+    short-name      => 'Distribution::Common',
     auth-matcher    => 'cpan:ugexe',
     version-matcher => '666',
 );

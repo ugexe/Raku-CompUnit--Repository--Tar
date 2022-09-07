@@ -1,0 +1,19 @@
+use Test:ver<6.c+>;
+plan 1;
+
+use CompUnit::Repository::Tar;
+use lib "CompUnit::Repository::Tar#{CompUnit::Repository::Tar.test-dist('PathTools-v0.2.0.tar.gz')}";
+
+
+subtest 'require module with no external dependencies' => {
+    {
+        dies-ok { ::("PathTools") };
+        lives-ok { require ::("PathTools") <&ls> }, 'module require-d ok';
+    }
+    {
+        require ::("PathTools") <&ls>;
+        ok &ls($*CWD).elems > 1;
+    }
+}
+
+done-testing;
