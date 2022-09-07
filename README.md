@@ -2,13 +2,13 @@
 
 Load modules directly from a .tar.gz archive
 
-# Synopsis
+## Synopsis
 
     use CompUnit::Repository::Tar;
-    use lib "CompUnit::Repository::Tar#resources/test-dists/zef.tar.gz";
+    use lib "CompUnit::Repository::Tar#resources/test-dists/PathTools-v0.2.0.tar.gz";
 
-    require "lib/Zef.pm6"  # `require` by relative path
-    require "Zef";         # `require` by name
-    use Zef;               # `use` by name
+    require "lib/PathTools.rakumod"  # `require` by relative path
+    require "PathTools";             # `require` by name
+    use PathTools;                   # `use` by name
 
-See: [tests](https://github.com/ugexe/CompUnit--Repository--Tar/blob/master/t)
+See: [tests](https://github.com/ugexe/Raku-CompUnit--Repository--Tar/blob/main/t)
